@@ -20,9 +20,6 @@
 #include "ipa_i.h"
 #include <linux/rmnet_ipa_fd_ioctl.h>
 
-/**
- * name of the DL wwan default routing tables for v4 and v6
- */
 #define IPA_A7_QMAP_HDR_NAME "ipa_qmap_hdr"
 #define IPA_DFLT_WAN_RT_TBL_NAME "ipa_dflt_wan_rt"
 #define MAX_NUM_Q6_RULE 35
@@ -60,10 +57,8 @@ struct rmnet_mux_val {
 int ipa_qmi_service_init(bool load_uc, uint32_t wan_platform_type);
 void ipa_qmi_service_exit(void);
 
-/* sending filter-install-request to modem*/
 int qmi_filter_request_send(struct ipa_install_fltr_rule_req_msg_v01 *req);
 
-/* sending filter-installed-notify-request to modem*/
 int qmi_filter_notify_send(struct ipa_fltr_installed_notif_req_msg_v01 *req);
 
 int qmi_enable_force_clear_datapath_send(
@@ -123,12 +118,6 @@ extern struct elem_info ipa_data_usage_quota_reached_ind_msg_data_v01_ei[];
 extern struct elem_info ipa_stop_data_usage_quota_req_msg_data_v01_ei[];
 extern struct elem_info ipa_stop_data_usage_quota_resp_msg_data_v01_ei[];
 
-/**
- * struct ipa_rmnet_context - IPA rmnet context
- * @ipa_rmnet_ssr: support modem SSR
- * @polling_interval: Requested interval for polling tethered statistics
- * @metered_mux_id: The mux ID on which quota has been set
- */
 struct ipa_rmnet_context {
 	bool ipa_rmnet_ssr;
 	u64 polling_interval;
@@ -136,5 +125,4 @@ struct ipa_rmnet_context {
 };
 
 extern struct ipa_rmnet_context ipa_rmnet_ctx;
-#endif /* IPA_QMI_SERVICE_H
- */
+#endif 

@@ -2269,7 +2269,7 @@ static int mmss_dbg_set_mux_sel(struct mux_clk *clk, int sel)
 
 	spin_lock_irqsave(&local_clock_reg_lock, flags);
 
-	/* Set debug mux clock index */
+	
 	regval = BVAL(11, 0, sel);
 	writel_relaxed(regval, MMSS_REG_BASE(MMSS_DEBUG_CLK_CTL));
 
@@ -2600,6 +2600,11 @@ int msm_mmsscc_8994_probe(struct platform_device *pdev)
 	int compatlen = 0;
 	bool is_v2 = false;
 
+        if (!pdev) {
+                pr_err("8994 mmss probe fails\n");
+                return -ENODEV;
+        }
+
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "cc_base");
 	if (!res) {
 		dev_err(&pdev->dev, "Unable to retrieve register base.\n");
@@ -2683,7 +2688,7 @@ int msm_mmsscc_8994_probe(struct platform_device *pdev)
 	ext_extpclk_clk_src.dev = &pdev->dev;
 	ext_extpclk_clk_src.clk_id = "extpclk_src";
 
-	/* Perform revision specific fixes */
+	
 	compat = of_get_property(pdev->dev.of_node, "compatible", &compatlen);
 	if (!compat || (compatlen <= 0))
 		return -EINVAL;

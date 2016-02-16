@@ -19,17 +19,6 @@
 
 #include "power_supply.h"
 
-/*
- * This is because the name "current" breaks the device attr macro.
- * The "current" word resolves to "(get_current())" so instead of
- * "current" "(get_current())" appears in the sysfs.
- *
- * The source of this definition is the device.h which calls __ATTR
- * macro in sysfs.h which calls the __stringify macro.
- *
- * Only modification that the name is not tried to be resolved
- * (as a macro let's say).
- */
 
 #define POWER_SUPPLY_ATTR(_name)					\
 {									\
@@ -121,7 +110,7 @@ static ssize_t power_supply_store_property(struct device *dev,
 	union power_supply_propval value;
 	long long_val;
 
-	/* TODO: support other types than int */
+	
 	ret = strict_strtol(buf, 10, &long_val);
 	if (ret < 0)
 		return ret;
@@ -135,9 +124,8 @@ static ssize_t power_supply_store_property(struct device *dev,
 	return count;
 }
 
-/* Must be in the same order as POWER_SUPPLY_PROP_* */
 static struct device_attribute power_supply_attrs[] = {
-	/* Properties of type `int' */
+	
 	POWER_SUPPLY_ATTR(status),
 	POWER_SUPPLY_ATTR(charge_type),
 	POWER_SUPPLY_ATTR(health),
@@ -155,6 +143,7 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(voltage_now),
 	POWER_SUPPLY_ATTR(voltage_avg),
 	POWER_SUPPLY_ATTR(voltage_ocv),
+	POWER_SUPPLY_ATTR(overload),
 	POWER_SUPPLY_ATTR(input_voltage_regulation),
 	POWER_SUPPLY_ATTR(current_max),
 	POWER_SUPPLY_ATTR(input_current_max),
@@ -213,26 +202,29 @@ static struct device_attribute power_supply_attrs[] = {
 	POWER_SUPPLY_ATTR(resistance_capacitive),
 	POWER_SUPPLY_ATTR(resistance_id),
 	POWER_SUPPLY_ATTR(resistance_now),
-	/* Local extensions */
+	
 	POWER_SUPPLY_ATTR(usb_hc),
 	POWER_SUPPLY_ATTR(usb_otg),
 	POWER_SUPPLY_ATTR(charge_enabled),
 	POWER_SUPPLY_ATTR(flash_current_max),
 	POWER_SUPPLY_ATTR(update_now),
 	POWER_SUPPLY_ATTR(esr_count),
+	POWER_SUPPLY_ATTR(otg_pulse_skip_en),
 	POWER_SUPPLY_ATTR(safety_timer_enabled),
 	POWER_SUPPLY_ATTR(charge_done),
 	POWER_SUPPLY_ATTR(flash_active),
 	POWER_SUPPLY_ATTR(force_tlim),
 	POWER_SUPPLY_ATTR(allow_detection),
 	POWER_SUPPLY_ATTR(cycle_count_id),
-	/* Local extensions of type int64_t */
+	
 	POWER_SUPPLY_ATTR(charge_counter_ext),
-	/* Properties of type `const char *' */
+	
 	POWER_SUPPLY_ATTR(model_name),
 	POWER_SUPPLY_ATTR(manufacturer),
 	POWER_SUPPLY_ATTR(serial_number),
 	POWER_SUPPLY_ATTR(battery_type),
+	POWER_SUPPLY_ATTR(temp_hot),
+	POWER_SUPPLY_ATTR(temp_cold),
 };
 
 static struct attribute *
@@ -334,8 +326,6 @@ int power_supply_uevent(struct device *dev, struct kobj_uevent_env *env)
 
 		ret = power_supply_show_property(dev, attr, prop_buf);
 		if (ret == -ENODEV || ret == -ENODATA) {
-			/* When a battery is absent, we expect -ENODEV. Don't abort;
-			   send the uevent with at least the the PRESENT=0 property */
 			ret = 0;
 			continue;
 		}
